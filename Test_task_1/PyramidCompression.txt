@@ -1,0 +1,135 @@
+# Импорт итератора
+from itertools import chain
+
+
+# Класс для записи строки в файл и её чтения из этого же файла
+class SomeClass:
+    def __init__(self, file_name, text):
+        self.file_name = file_name
+        self.text = text
+    
+    def write_file(self):
+        with open(self.file_name, 'w') as f:
+            f.write(self.text)
+        return f'Произошла запись строки в файл: {self.file_name}'
+    
+    def open_file(self):
+        with open(self.file_name, 'r') as f:
+            string = f.read()
+        return string
+
+class PyramidCompression:
+    
+    def __init__(self, text):
+        self.text = text
+    
+    # Проверка на то, является ли длина строки числом степенью 4 и рассчёт количества пирамид на каждом уровне итоговой пирамиды
+    def check_level(self):
+        num = len(self.text)
+        while num % 4 == 0 and num != 0:
+            num //= 4
+        if num != 1:
+            print('Длина строки не является степенью числа 4') 
+            return 
+        else:
+            sum_string = 1
+            level_p = {}
+            level_p[1] = 1
+            n = 2
+            while sum_string != len(self.text) / 4:
+                level_p[n] = level_p[n-1] + 2
+                sum_string += level_p[n]
+                n += 1
+            return level_p
+        
+    # Разделение исходной строки на пирамиды согласно условию задачи
+    def bild_piramids(self):
+        level_p = self.check_level()
+        p_max = max(level_p.keys())
+        p_all = []
+        for l in range(1, p_max+1)[::-1]:
+            p = []
+            for i in range(level_p[l]):
+                if i % 2 == 0:
+                    p.append(self.text[i*2: i*2+3] + self.text[i*2+2*level_p[l]+1])
+                else:
+                    p.append(self.text[i*2+1] + self.text[i*2+2*level_p[l]: i*2+2*level_p[l]+3])
+            p_all.append(p)
+            self.text = self.text[i*2+2*level_p[l]+2:]
+        p_all = list(chain.from_iterable(p_all))
+        return p_all
+    
+    # Сжатие пирамид и вывод получившегося результата в виде строки
+    def comp_piramids(self, t=None):
+        self.t = t
+        if len(self.text) == 1:
+            return self.text
+        p_new = []
+        p_all = self.bild_piramids()
+        for p in p_all:
+            if p[0] == p[1] == p[2] == p[3]:
+                p_new.append(p[0])
+        if (len(p_new) % 4 == 0) and (len(p_new) > 0):
+            output = ''.join(p_new)
+            self.text = output
+            return self.comp_piramids()
+        else:
+            output = ''.join(p_all)
+            return output
+
+
+
+
+# Строки для теста
+text1 = 'a'
+text2 = 'abcd'
+text3 = 'aaabcccabbbcdddd'
+text4 = 'aaaaaaabcccccccaaaaabbbcccccaaabbbbbcccabbbbbbbcdddddddddddddddd'
+
+# Вызов класса и запись с помощью него строки в файл
+my_object1 = SomeClass('input1.txt', text1)
+my_object1.write_file()
+my_object2 = SomeClass('input2.txt', text2)
+my_object2.write_file()
+my_object3 = SomeClass('input3.txt', text3)
+my_object3.write_file()
+my_object4 = SomeClass('input4.txt', text4)
+my_object4.write_file()
+
+# Чтение строки из файла
+string1 = my_object1.open_file()
+string2 = my_object2.open_file()
+string3 = my_object3.open_file()
+string4 = my_object4.open_file()
+print(string1)
+print(string2)
+print(string3)
+print(string4)
+
+# Проверка 1 строки
+comp_str1 = PyramidCompression(string1)
+out_1 = comp_str1.comp_piramids()
+output1 = SomeClass('output1.txt', out_1)
+output1.write_file()
+print(out_1)
+
+# Проверка 2 строки
+comp_str2 = PyramidCompression(string2)
+out_2 = comp_str2.comp_piramids()
+output2 = SomeClass('output2.txt', out_2)
+output2.write_file()
+print(out_2)
+
+# Проверка 3 строки
+comp_str3 = PyramidCompression(string3)
+out_3 = comp_str3.comp_piramids()
+output3 = SomeClass('output3.txt', out_3)
+output3.write_file()
+print(out_3)
+
+# Проверка 4 строки
+comp_str4 = PyramidCompression(string4)
+out_4 = comp_str4.comp_piramids()
+output4 = SomeClass('output4.txt', out_4)
+output4.write_file()
+print(out_4)
